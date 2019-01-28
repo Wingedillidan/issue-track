@@ -33,12 +33,13 @@ export default class SelectRepo extends React.Component {
     }
 
     render() {
-        const {repos} = this.state;
+        const {repos, error} = this.state;
         return (
             <form className="select-repo" onSubmit={e => {
                 e.preventDefault();
 
                 if (!e.target.term.value.trim()) {
+                    this.setState({error: 'No search term entered.'})
                     return;
                 }
 
@@ -46,7 +47,9 @@ export default class SelectRepo extends React.Component {
             }}>
                 <input name="term" placeholder="Search Github Repos" />
                 <div className="repo-list">
-                    {repos.map((repo) => (
+                    {error ?
+                    <p className="error">{error}</p> :
+                    repos.map((repo) => (
                         <span onClick={this.selectRepo(repo)}>
                             <label>{repo.owner.login}</label>
                             {repo.name}
