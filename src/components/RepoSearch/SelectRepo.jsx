@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import api from '../api/github';
+import RepoList from './RepoList';
+import api from '../../api/github';
 
 export default class SelectRepo extends React.Component {
     constructor(props) {
@@ -8,28 +9,21 @@ export default class SelectRepo extends React.Component {
 
         this.state = {
             repos: [],
-            error: ''
+            error: '',
+            loading: false
         };
     }
 
     searchRepos(term) {
+        this.setState({loading: true, error: ''})
         api.searchRepositories(term)
             .then(response => {
-                console.log(response);
                 if (response.data.total_count === 0) {
-                    this.setState({error: 'Could not find any repos :('});
+                    this.setState({error: 'No repos were found.', loading: false});
                     return;
                 }
-                this.setState({repos: response.data.items})
+                this.setState({repos: response.data.items, loading: false});
             });
-    }
-
-    selectRepo(repo) {
-        const {selectRepo} = this.props;
-        return (e) => {
-            e.preventDefault();
-            selectRepo(repo);
-        }
     }
 
     render() {
@@ -46,16 +40,7 @@ export default class SelectRepo extends React.Component {
                 this.searchRepos(e.target.term.value);
             }}>
                 <input name="term" placeholder="Search Github Repos" />
-                <div className="repo-list">
-                    {error ?
-                    <p className="error">{error}</p> :
-                    repos.map((repo) => (
-                        <span onClick={this.selectRepo(repo)}>
-                            <label>{repo.owner.login}</label>
-                            {repo.name}
-                        </span>
-                    ))}
-                </div>
+                <RepoList repos={repos} error={error} selectRepo={this.props.selectRepo} />
             </form>
         )
     }
