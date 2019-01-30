@@ -10,7 +10,6 @@ export default function IssueList ({issues, error, selectIssue}) {
             }
         }
     }
-
     if (error) {
         return (
             <div className="issue-list">
@@ -21,7 +20,7 @@ export default function IssueList ({issues, error, selectIssue}) {
         return (
             <div className="issue-list">
                 {issues.map((issue) => (
-                    <span onClick={select(issue)}>
+                    <span key={issue.id} onClick={select(issue)}>
                         <span className="issue-number">{issue.number}</span> {issue.title}
                     </span>
                 ))}

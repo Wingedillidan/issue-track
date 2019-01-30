@@ -7,42 +7,71 @@ export default class RepoCard extends React.Component {
         super(props);
         this.state = {
             addMode: false,
-            issues: [],
             allIssues: [],
-            error: ''
+            selectError: '',
+            listError: ''
         }
 
         this.toggleAdd = this.toggleAdd.bind(this);
         this.addIssue = this.addIssue.bind(this);
+        this.removeIssue = this.removeIssue.bind(this);
     }
 
     addIssue(issue) {
-        const {allIssues, issues} = this.state;
+        const {allIssues} = this.state;
+        const {repo, save} = this.props;
 
         const i = allIssues.findIndex(o => o.id === issue.id);
 
         if (i >= 0) {
             const updatedAllIssues = allIssues.slice();
-            const updatedIssues = issues.slice();
+            const updatedIssues = repo.issues.slice();
             updatedAllIssues.splice(i, 1);
 
-            const i = updatedIssues.findIndex(o => o.id === issue.id);
+            const j = updatedIssues.findIndex(o => o.id === issue.id);
 
-            if (i < 0) {
+            if (j < 0) {
                 updatedIssues.push(issue);
+                repo.issues = updatedIssues;
             }
 
-            this.setState({allIssues: updatedAllIssues, issues: updatedIssues});
+            this.setState({allIssues: updatedAllIssues}, () => save());
+        }
+    }
+
+    removeIssue(issue) {
+        const {repo, save} = this.props;
+
+        const updatedIssues = repo.issues.slice();
+
+        const i = updatedIssues.findIndex(o => o.id === issue.id);
+
+        if (i >= 0) {
+            updatedIssues.splice(i, 1);
+            repo.issues = updatedIssues;
+
+            // Bit of a hack I know :(
+            this.forceUpdate(() => save());
         }
     }
 
     fetchIssues() {
         const {repo} = this.props;
 
+        this.setState({selectError: 'Loading...'})
+
         this.setState({allIssues: []}, () => {
-            api.getIssues(repo.full_name).then((response) => {
-                this.setState({allIssues: response.data});
-            })
+            api.getIssues(repo.full_name)
+                .then((response) => {
+                    if (!response.data.length) {
+                        this.setState({selectError: 'No issues exist on this repo.'})
+                    } else {
+                        this.setState({allIssues: response.data, selectError: ''});
+                    }
+                })
+                .catch(() => {
+                    this.setState({selectError: 'There was a problem loading issues.'})
+                });
         });
     }
 
@@ -55,7 +84,7 @@ export default class RepoCard extends React.Component {
 
     render() {
         const {repo, removeRepo} = this.props;
-        const {addMode, allIssues, issues} = this.state;
+        const {addMode, allIssues, selectError, listError} = this.state;
         return (
             <div className="repo-card">
                 <span className="close" onClick={() => removeRepo(repo)}>X</span>
@@ -66,12 +95,12 @@ export default class RepoCard extends React.Component {
                 {addMode ? (
                     <div>
                         <span className="stop-adding" onClick={() => this.toggleAdd(false)}>Stop Adding</span>
-                        <IssueList issues={allIssues} selectIssue={this.addIssue} />
+                        <IssueList issues={allIssues} selectIssue={this.addIssue} error={selectError} />
                     </div>
                 ) : (
                     <div>
-                        <span className="add-issue" onClick={() => this.toggleAdd(true)}>Add Issue</span>
-                        <IssueList issues={issues} />
+                        <IssueList issues={repo.issues} selectIssue={this.removeIssue} error={listError} />
+                        <span className="add-issue" onClick={() => this.toggleAdd(true)} />
                     </div>
                 )}
             </div>

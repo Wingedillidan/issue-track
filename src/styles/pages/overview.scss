@@ -6,6 +6,11 @@ input {
     background-color: #ccc;
 }
 
+.error {
+    color: rgba(255, 255, 255, .8);
+    text-align: center;
+}
+
 .container {
     display: flex;
     width: 100vw;
@@ -42,11 +47,6 @@ input {
                 color: white;
                 font-size: 1em;
                 overflow-y: auto;
-
-                .error {
-                    color: rgba(255, 255, 255, .8);
-                    text-align: center;
-                }
 
                 span {
                     display: block;
@@ -91,6 +91,7 @@ input {
             height: 100%;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
             flex-wrap: wrap;
             overflow-y: auto;
 
@@ -101,7 +102,7 @@ input {
             }
 
             .repo-card {
-                min-height: 25rem;
+                // height: 20rem;
                 border: .06rem solid #444;
                 color: white;
                 background-color: #222;
@@ -135,16 +136,40 @@ input {
                     cursor: pointer;
                     display: block;
                     margin: .5rem;
-                    padding: .1rem 0;
-                    border-radius: .2em;
                     text-align: center;
-                    background-color: #777;
                     transition: .2s;
+                    background-color: #777;
 
                     &:hover {
                         background-color: #999;
                     }
                 }
+                .add-issue {
+                    border-radius: 50%;
+                    width: 3rem;
+                    height: 3rem;
+                    font-size: 2em;
+                    position: relative;
+
+                    &:after {
+                        position: absolute;
+                        font-size: 1.5em;
+                        font-weight: 100;
+                        content: '+';
+                        color: white;
+                        top: 40%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                    }
+
+                }
+
+                .stop-adding {
+                    border-radius: .2em;
+                    margin-bottom: 1.6rem;
+                    padding: .3rem 0;
+                }
+
 
                 .close {
                     position: absolute;

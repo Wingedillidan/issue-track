@@ -18,7 +18,7 @@ export default function RepoList ({repos, error, selectRepo}) {
         return (
             <div className="repo-list">
                 {repos.map((repo) => (
-                    <span onClick={select(repo)}>
+                    <span key={repo.full_name} onClick={select(repo)}>
                         <label>{`${repo.owner.login}/`}</label>
                         {repo.name}
                     </span>

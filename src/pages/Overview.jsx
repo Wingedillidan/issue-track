@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import SelectRepo from '../components/RepoSearch/SelectRepo';
-import RepoCollection from '../components/RepoCollection';
+import RepoDeck from '../components/RepoDeck';
 import '../styles/pages/overview.scss';
 
 export default class Overview extends React.Component {
@@ -16,6 +16,15 @@ export default class Overview extends React.Component {
         this.selectRepo = this.selectRepo.bind(this);
     }
 
+    componentDidMount() {
+        const load = window.localStorage.getItem('repos');
+
+        if (load) {
+            this.setState({repos: JSON.parse(load)})
+        }
+
+    }
+
     removeRepo(repo) {
         const {repos} = this.state;
 
@@ -25,7 +34,7 @@ export default class Overview extends React.Component {
             const updatedRepos = repos.slice();
             updatedRepos.splice(i, 1);
 
-            this.setState({repos: updatedRepos});
+            this.setState({repos: updatedRepos}, () => this.save()());
         }
     }
 
@@ -38,8 +47,12 @@ export default class Overview extends React.Component {
             repo.issues = [];
             const updatedRepos = [...repos.slice(), repo];
 
-            this.setState({repos: updatedRepos});
+            this.setState({repos: updatedRepos}, () => this.save()());
         }
+    }
+
+    save() {
+        return () => window.localStorage.setItem('repos', JSON.stringify(this.state.repos));
     }
 
     render() {
@@ -50,7 +63,7 @@ export default class Overview extends React.Component {
                     <SelectRepo selectRepo={this.selectRepo} />
                 </div>
                 <div className="main-list">
-                    <RepoCollection removeRepo={this.removeRepo} repos={repos} />
+                    <RepoDeck removeRepo={this.removeRepo} repos={repos} save={this.save()} />
                 </div>
             </div>
         )

@@ -9,21 +9,23 @@ export default class SelectRepo extends React.Component {
 
         this.state = {
             repos: [],
-            error: '',
-            loading: false
+            error: ''
         };
     }
 
     searchRepos(term) {
-        this.setState({loading: true, error: ''})
+        this.setState({loading: true, error: 'Loading...'})
         api.searchRepositories(term)
             .then(response => {
                 if (response.data.total_count === 0) {
-                    this.setState({error: 'No repos were found.', loading: false});
+                    this.setState({error: 'No repos were found.'});
                     return;
                 }
-                this.setState({repos: response.data.items, loading: false});
-            });
+                this.setState({repos: response.data.items, error: ''});
+            })
+            .catch(() => {
+                this.setState({error: 'Something went wrong.'});
+            })
     }
 
     render() {
